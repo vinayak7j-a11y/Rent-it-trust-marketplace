@@ -2,6 +2,7 @@ import { ItemState } from '../enums';
 import { emitEvent } from '../../events/eventEmitter';
 import { EventType } from '../../events/eventTypes';
 
+
 export class InvalidItemStateTransitionError extends Error {
   constructor(from: ItemState, to: ItemState) {
     super(`Invalid item state transition: ${from} → ${to}`);

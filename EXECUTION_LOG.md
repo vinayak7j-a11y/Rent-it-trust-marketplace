@@ -121,4 +121,75 @@ Resolutions:
 Notes to Future Self:
 - Never paste plain text into terminal
 - One database, one DATABASE_URL
-- Tooling warnings are not runtime risks by default
+- Tooling warnings are not runtime risks by default 
+
+Additional Fix:
+- Implemented enforceUserStatus middleware to block banned and limited users
+- Ensured access control is enforced at route level 
+
+## DAY 5 — LANGUAGE SELECTION
+Status: DONE
+
+Start Time:
+End Time:
+
+Completed:
+- Added explicit language selection for users (EN / HI)
+- Stored language preference in user profile
+- Created language-specific system rule files
+- Implemented rule loading strictly based on selected language
+- Ensured no default or fallback language is used
+
+Decisions Locked:
+- Users must explicitly choose a language
+- Rules are served only in the selected language
+- No silent fallback to English is allowed
+- Legal clarity overrides convenience
+
+Problems Faced:
+- None critical; required discipline to avoid auto-defaults
+
+Resolutions:
+- Enforced language persistence at the user level
+- Forced hard failure if rules for a language are missing
+
+Notes to Future Self:
+- Never assume a user understands rules in another language
+- If a new language is added, rules must be added first
+- Language ambiguity is a legal and trust risk
+
+## DAY 6 — RULE ACCEPTANCE (BLOCKING)
+Status: DONE
+
+Start Time:
+End Time:
+
+Completed:
+- Designed versioned rule acceptance system
+- Added RuleVersion and UserRuleAcceptance models
+- Enforced bidirectional relations for legal integrity
+- Implemented Prisma v7-compatible config (schema vs config separation)
+- Successfully migrated rule versioning tables
+- Verified DB state via Prisma Studio
+
+Decisions Locked:
+- Rule acceptance is immutable and versioned
+- No critical action allowed without accepting latest rules
+- Legal consent history must always be auditable
+- Prisma v7 config is canonical (no datasource URL in schema)
+
+Problems Faced:
+- Prisma v7 breaking changes caused repeated migration failures
+- Datasource URL handling differed from older Prisma versions
+- CLI did not auto-load .env variables
+
+Resolutions:
+- Moved DATABASE_URL to prisma.config.ts (v7-compliant)
+- Exported DATABASE_URL into shell for Prisma CLI
+- Installed dotenv-cli to prevent future env loading issues
+- Fixed missing opposite relation fields in schema
+
+Notes to Future Self:
+- Do NOT bypass rule acceptance middleware
+- If Prisma migration fails, check env loading first
+- This day was painful — but it permanently hardened the system

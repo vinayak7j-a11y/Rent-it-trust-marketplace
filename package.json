@@ -4,17 +4,19 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "dev": "node -r dotenv/config ./node_modules/.bin/ts-node src/app.ts"
+    "dev": "node -r dotenv/config ./node_modules/.bin/ts-node src/app.ts",
+    "prisma:studio": "dotenv prisma studio",
+    "prisma:migrate": "dotenv prisma migrate dev",
+    "prisma:status": "dotenv prisma migrate status"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
     "@fastify/jwt": "^10.0.0",
-    "@prisma/adapter-pg": "^7.2.0",
-    "@prisma/client": "^7.2.0",
+    "@prisma/client": "^5.22.0",
     "dotenv": "^17.2.3",
     "fastify": "^5.7.1",
     "pg": "^8.17.1",
-    "prisma": "^7.2.0",
+    "prisma": "^5.22.0",
     "uuid": "^13.0.0",
     "zod": "^4.3.5"
   },
