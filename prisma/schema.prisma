@@ -7,8 +7,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// ENUMS
-
 enum UserRole {
   renter
   owner
@@ -28,8 +26,6 @@ enum Language {
   hi
 }
 
-// MODELS
-
 model User {
   id         String     @id @default(uuid())
   phone      String     @unique
@@ -38,6 +34,63 @@ model User {
   language   Language
   trustScore Int        @default(0)
 
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  // relations
+  wallet      Wallet?
+  trustEvents TrustEvent[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Wallet {
+  id       String @id @default(uuid())
+  userId   String @unique
+  currency String @default("INR")
+
+  user   User          @relation(fields: [userId], references: [id])
+  ledger LedgerEntry[]
+
+  createdAt DateTime @default(now())
+}
+
+model LedgerEntry {
+  id          String  @id @default(uuid())
+  walletId    String
+  amount      Int
+  type        String
+  reason      String
+  referenceId String?
+
+  wallet Wallet @relation(fields: [walletId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Escrow {
+  id        String @id @default(uuid())
+  bookingId String @unique
+
+  renterId String
+  ownerId  String
+
+  rentalFee Int
+  deposit   Int
+
+  status String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TrustEvent {
+  id          String  @id @default(uuid())
+  userId      String
+  type        String
+  delta       Int
+  reason      String
+  referenceId String?
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
