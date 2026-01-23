@@ -57,3 +57,11 @@ export enum DamageType {
   MISSING_ITEM = 'missing_item',
   IRREVERSIBLE_DAMAGE = 'irreversible_damage',
 }
+
+export enum TrustEventType {
+  CLEAN_RETURN = 'clean_return',
+  LATE_RETURN = 'late_return',
+  DAMAGE_REPORTED = 'damage_reported',
+  REPEATED_GOOD = 'repeated_good',
+}
+

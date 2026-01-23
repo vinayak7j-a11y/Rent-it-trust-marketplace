@@ -193,3 +193,50 @@ Notes to Future Self:
 - Do NOT bypass rule acceptance middleware
 - If Prisma migration fails, check env loading first
 - This day was painful — but it permanently hardened the system
+
+## Day 7 — Wallet & Ledger (Infrastructure)
+
+Status: ✅ COMPLETE
+
+Summary:
+- Prisma setup stabilized after toolchain conflicts
+- Prisma Client successfully generated (v5.22.0)
+- schema.prisma validated and cleaned
+- User domain model restored
+- TypeScript and Prisma fully aligned
+- `prisma.user` access confirmed across services
+
+Notes:
+- Encountered Prisma v7 + TS incompatibility
+- Resolved by pinning Prisma v5 and hard-resetting schema
+- Infra is now stable and ready for escrow logic
+
+Decision:
+- Day 7 locked
+- Proceeding to Day 8 (Escrow System)
+
+
+## Day 8 — Escrow System (Money Authority)
+
+Status: ✅ COMPLETE & VERIFIED
+
+Summary:
+- Escrow model implemented and tied 1:1 with booking lifecycle
+- Rental fee and deposit captured upfront under platform control
+- Owner payout blocked until escrow release
+- Deposit isolated from owner wallet
+- Escrow status governs fund movement
+- `createdAt` and `updatedAt` timestamps verified
+
+Notes:
+- Initial confusion caused by Prisma Studio column visibility (scroll issue)
+- Database schema confirmed via psql inspection
+- Timestamp behavior verified via manual row creation and update
+- `createdAt` confirmed immutable
+- `updatedAt` confirmed to update automatically on Prisma updates
+
+Verification:
+- `prisma migrate status` clean (no drift)
+- Escrow table inspected directly in Postgres
+- Escrow row created and updated in Prisma Studio
+- Times
