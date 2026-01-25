@@ -37,6 +37,7 @@ model User {
   // relations
   wallet      Wallet?
   trustEvents TrustEvent[]
+  ruleAcceptances UserRuleAcceptance[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,4 +94,31 @@ model TrustEvent {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model RuleVersion {
+  id        String   @id @default(uuid())
+  version   Int
+  language  Language
+  content   String
+  isActive  Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  acceptances UserRuleAcceptance[]
+
+  @@unique([version, language])
+}
+
+model UserRuleAcceptance {
+  id            String   @id @default(uuid())
+  userId        String
+  ruleVersionId String
+
+  acceptedAt    DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id])
+  ruleVersion RuleVersion @relation(fields: [ruleVersionId], references: [id])
+
+  @@unique([userId, ruleVersionId])
 }

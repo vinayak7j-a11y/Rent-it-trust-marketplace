@@ -59,6 +59,41 @@ CREATE TABLE "Escrow" (
     CONSTRAINT "Escrow_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "TrustEvent" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "delta" INTEGER NOT NULL,
+    "reason" TEXT NOT NULL,
+    "referenceId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "TrustEvent_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RuleVersion" (
+    "id" TEXT NOT NULL,
+    "version" INTEGER NOT NULL,
+    "language" "Language" NOT NULL,
+    "content" TEXT NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "RuleVersion_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "UserRuleAcceptance" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "ruleVersionId" TEXT NOT NULL,
+    "acceptedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "UserRuleAcceptance_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
 
@@ -68,8 +103,23 @@ CREATE UNIQUE INDEX "Wallet_userId_key" ON "Wallet"("userId");
 -- CreateIndex
 CREATE UNIQUE INDEX "Escrow_bookingId_key" ON "Escrow"("bookingId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "RuleVersion_version_language_key" ON "RuleVersion"("version", "language");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "UserRuleAcceptance_userId_ruleVersionId_key" ON "UserRuleAcceptance"("userId", "ruleVersionId");
+
 -- AddForeignKey
 ALTER TABLE "Wallet" ADD CONSTRAINT "Wallet_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LedgerEntry" ADD CONSTRAINT "LedgerEntry_walletId_fkey" FOREIGN KEY ("walletId") REFERENCES "Wallet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TrustEvent" ADD CONSTRAINT "TrustEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserRuleAcceptance" ADD CONSTRAINT "UserRuleAcceptance_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserRuleAcceptance" ADD CONSTRAINT "UserRuleAcceptance_ruleVersionId_fkey" FOREIGN KEY ("ruleVersionId") REFERENCES "RuleVersion"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
