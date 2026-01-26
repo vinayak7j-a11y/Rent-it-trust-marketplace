@@ -319,4 +319,12 @@ Decisions Locked:
 - No feature bypasses trust context
 
 Notes to Future Self:
-- If users complain, trust is working.
+- If users complain, trust is working. 
+
+Recheck Fixes Applied:
+- Removed floating-point deposit math
+- Implemented integer-safe deposit ratios
+- Forward-compatible booking access levels
+- Trust policy documented
+
+Status: VERIFIED
