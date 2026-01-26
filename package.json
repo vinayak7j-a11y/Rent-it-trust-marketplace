@@ -7,9 +7,11 @@
   "scripts": {
     "dev": "ts-node src/app.ts",
     "check": "tsc --noEmit",
+    "start": "node dist/index.js",
     "prisma:studio": "dotenv prisma studio",
     "prisma:migrate": "dotenv prisma migrate dev",
-    "prisma:status": "dotenv prisma migrate status"
+    "prisma:status": "dotenv prisma migrate status",
+    "build": "tsc --noEmit"
   },
   "dependencies": {
     "@fastify/cors": "^11.2.0",
