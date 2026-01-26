@@ -65,3 +65,4 @@ export enum TrustEventType {
   REPEATED_GOOD = 'repeated_good',
 }
 
+

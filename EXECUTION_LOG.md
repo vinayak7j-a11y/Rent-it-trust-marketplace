@@ -156,7 +156,7 @@ Resolutions:
 Notes to Future Self:
 - Never assume a user understands rules in another language
 - If a new language is added, rules must be added first
-- Language ambiguity is a legal and trust risk
+- Language ambiguity is a legal and trust risk 
 
 ## DAY 6 — RULE ACCEPTANCE (BLOCKING)
 Status: DONE
@@ -192,7 +192,57 @@ Resolutions:
 Notes to Future Self:
 - Do NOT bypass rule acceptance middleware
 - If Prisma migration fails, check env loading first
-- This day was painful — but it permanently hardened the system
+- This day was painful — but it permanently hardened the system 
+
+## DAY 6 — RULE ACCEPTANCE (BLOCKING)
+
+Status: ✅ COMPLETE
+
+Start Time: —
+End Time: —
+
+### Implemented
+- Added `RuleVersion` model (versioned, language-specific, immutable)
+- Added `UserRuleAcceptance` model (user ↔ ruleVersion, auditable)
+- Enforced unique constraints on `(userId, ruleVersionId)`
+- Added bidirectional relations with `User`
+- Implemented rule authority service:
+  - `getActiveRule(language)`
+  - `acceptActiveRule(userId, language)`
+  - `hasAcceptedActiveRule(userId, language)`
+- Implemented blocking middleware for protected actions
+- Integrated language-based rule loading
+- Decoupled domain enums from Prisma enums
+
+### Guarantees Enforced
+- No booking / demand / payout without latest rule acceptance
+- Rule acceptance history is permanent
+- New rule versions force re-acceptance
+- Platform is final authority (no user-side ambiguity)
+
+### Infra / Tooling
+- Prisma schema stabilized
+- Clean DB reset (pre-MVP safe)
+- Single canonical migration created
+- Prisma Client regenerated successfully
+- TypeScript validation passed (`tsc --noEmit`)
+
+### Issues Encountered
+- Prisma client generated without enums/models
+- Prisma enum exports unavailable
+- Migration history drift after resets
+
+### Resolutions
+- Forced single schema usage
+- Reset DB and migrations
+- Regenerated Prisma Client
+- Switched to domain-level `Language` enum
+
+### Final State
+- Rule acceptance layer fully functional
+- Compile-safe and migration-safe
+- Day 6 locked and must not be overwritten 
+
 
 ## Day 7 — Wallet & Ledger (Infrastructure)
 
