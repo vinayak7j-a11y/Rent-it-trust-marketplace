@@ -1,4 +1,4 @@
-import { TrustEventType } from '../../domain/enums';
+import { TrustEventType } from '../../domain';
 
 export function getTrustDelta(event: TrustEventType): number {
   switch (event) {

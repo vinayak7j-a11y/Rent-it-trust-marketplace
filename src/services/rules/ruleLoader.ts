@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Language } from '../../domain/enums';
+import { Language } from '../../domain';
 
 export function loadSystemRules(language: Language): string {
   const filePath = path.join(

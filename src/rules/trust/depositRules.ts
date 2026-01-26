@@ -1,4 +1,5 @@
-import { TrustTier } from '../../domain/enums';
+
+import { TrustTier } from '../../domain';
 
 /**
  * Deposit multiplier expressed as a ratio to avoid floating-point errors.

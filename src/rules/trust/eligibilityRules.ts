@@ -1,4 +1,5 @@
-import { TrustTier } from '../../domain/enums';
+import { TrustTier } from '../../domain';
+
 
 export type BookingAccessLevel = 'blocked' | 'restricted' | 'full';
 

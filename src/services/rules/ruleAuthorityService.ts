@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { Language } from '../../domain/enums';
+import { Language } from '../../domain';
 
 
 

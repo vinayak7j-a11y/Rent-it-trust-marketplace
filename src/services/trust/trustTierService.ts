@@ -1,4 +1,5 @@
-import { TrustTier } from '../../domain/enums';
+import { TrustTier } from '../../domain';
+
 
 export function resolveTrustTier(trustScore: number): TrustTier {
   if (trustScore >= 50) return TrustTier.HIGH;

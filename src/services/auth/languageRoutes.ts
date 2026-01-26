@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { prisma } from '../../infra/db/prisma';
-import { Language } from '../../domain/enums';
+import { Language } from '../../domain';
 
 export async function languageRoutes(app: FastifyInstance) {
   app.post(

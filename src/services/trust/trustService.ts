@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { TrustEventType } from '../../domain/enums';
+import { TrustEventType } from '../../domain';
+
 import { getTrustDelta } from '../../rules/trust/trustRules';
 
 const prisma = new PrismaClient();

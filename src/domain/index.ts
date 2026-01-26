@@ -5,3 +5,4 @@ export * from './enums/language';
 export * from './enums/itemState';
 export * from './enums/bookingState';
 export * from './enums/damageType';
+export * from './enums/trustEventType';

@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { sendOtp, verifyOtp } from '../../infra/auth/otpService';
 import { prisma } from '../../infra/db/prisma';
-import { UserRole, UserStatus, Language } from '../../domain/enums';
+import { UserRole, UserStatus, Language } from '../../domain';
 
 export async function authRoutes(app: FastifyInstance) {
   app.post('/auth/login', async (req, reply) => {
