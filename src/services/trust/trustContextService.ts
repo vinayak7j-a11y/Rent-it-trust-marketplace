@@ -1,10 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { resolveTrustTier } from './trustTierService';
 import { getDepositMultiplier } from '../../rules/trust/depositRules';
-import {
-  canRequestBooking,
-  canAccessPremiumItems,
-} from '../../rules/trust/eligibilityRules';
+import { getBookingAccessLevel } from '../../rules/trust/eligibilityRules';
 
 const prisma = new PrismaClient();
 
@@ -19,11 +16,11 @@ export async function getTrustContext(userId: string) {
 
   const tier = resolveTrustTier(user.trustScore);
 
+  // Assumes trustScore is up-to-date (see trust decay job)
   return {
     trustScore: user.trustScore,
     tier,
     depositMultiplier: getDepositMultiplier(tier),
-    canRequestBooking: canRequestBooking(tier),
-    canAccessPremiumItems: canAccessPremiumItems(tier),
+    bookingAccess: getBookingAccessLevel(tier),
   };
 }

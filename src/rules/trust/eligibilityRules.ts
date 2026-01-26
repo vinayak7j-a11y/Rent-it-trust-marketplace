@@ -1,9 +1,21 @@
 import { TrustTier } from '../../domain/enums';
 
-export function canRequestBooking(tier: TrustTier): boolean {
-  return tier !== TrustTier.LOW;
-}
+export type BookingAccessLevel = 'blocked' | 'restricted' | 'full';
 
-export function canAccessPremiumItems(tier: TrustTier): boolean {
-  return tier === TrustTier.HIGH;
+/**
+ * Determines how a user can book, not just whether they can.
+ */
+export function getBookingAccessLevel(
+  tier: TrustTier
+): BookingAccessLevel {
+  switch (tier) {
+    case TrustTier.HIGH:
+      return 'full';
+
+    case TrustTier.MEDIUM:
+      return 'full';
+
+    case TrustTier.LOW:
+      return 'restricted';
+  }
 }

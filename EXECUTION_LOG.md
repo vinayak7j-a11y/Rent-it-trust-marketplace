@@ -290,3 +290,33 @@ Verification:
 - Escrow table inspected directly in Postgres
 - Escrow row created and updated in Prisma Studio
 - Times
+
+## DAY 9 — TRUST SIGNALS
+Status: DONE
+
+Completed:
+- Trust events model created
+- Centralized trust delta rules
+- Atomic trust update service
+
+Decisions Locked:
+- Trust changes only via events
+- Trust logic is invisible to users
+
+Notes to Future Self:
+- Never add UI explanations for trust math
+
+## DAY 10 — TRUST EFFECTS
+Status: DONE
+
+Completed:
+- Trust tier resolution
+- Deposit multipliers enforced by tier
+- Eligibility gates defined
+
+Decisions Locked:
+- Trust affects outcomes, not explanations
+- No feature bypasses trust context
+
+Notes to Future Self:
+- If users complain, trust is working.
