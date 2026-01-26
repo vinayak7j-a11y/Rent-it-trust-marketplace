@@ -1,4 +1,5 @@
-import { ItemState } from '../enums';
+import { ItemState } from '../';
+
 import { emitEvent } from '../../events/eventEmitter';
 import { EventType } from '../../events/eventTypes';
 

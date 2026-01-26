@@ -33,14 +33,15 @@ model User {
   status     UserStatus
   language   Language
   trustScore Int        @default(0)
-
+  lastTrustEventAt DateTime? 
   // relations
   wallet      Wallet?
   trustEvents TrustEvent[]
   ruleAcceptances UserRuleAcceptance[]
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @updatedAt 
+  
 }
 
 model Wallet {

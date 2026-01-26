@@ -1,6 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { TrustEventType } from '../../domain';
-
+import { TrustEventType } from '../../domain/enums';
 import { getTrustDelta } from '../../rules/trust/trustRules';
 
 const prisma = new PrismaClient();
@@ -29,6 +28,7 @@ export async function applyTrustEvent(input: {
         trustScore: {
           increment: delta,
         },
+        lastTrustEventAt: new Date(),
       },
     }),
   ]);
