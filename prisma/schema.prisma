@@ -123,3 +123,22 @@ model UserRuleAcceptance {
 
   @@unique([userId, ruleVersionId])
 }
+
+model Item {
+  id          String   @id @default(uuid())
+  ownerId     String
+
+  category    String
+  gender      String
+  size        String
+  fabric      String
+  wearLevel   String
+
+  state       String
+  zone        String
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner       User     @relation(fields: [ownerId], references: [id])
+}

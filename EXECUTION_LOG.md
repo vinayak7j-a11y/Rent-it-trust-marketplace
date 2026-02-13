@@ -327,4 +327,20 @@ Recheck Fixes Applied:
 - Forward-compatible booking access levels
 - Trust policy documented
 
-Status: VERIFIED
+Status: VERIFIED 
+
+## DAY 11 — TRUST DECAY
+Status: DONE
+
+Completed:
+- Trust inactivity tracking added
+- Daily decay job implemented
+- Trust erosion bounded at zero
+
+Decisions Locked:
+- Trust is earned continuously, not permanently
+- Inactivity causes slow decay
+
+Notes to Future Self:
+- Never “reset” trust manually to zero.
+
