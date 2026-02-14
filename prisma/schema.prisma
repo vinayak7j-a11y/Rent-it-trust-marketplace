@@ -27,21 +27,22 @@ enum Language {
 }
 
 model User {
-  id         String     @id @default(uuid())
-  phone      String     @unique
-  role       UserRole
-  status     UserStatus
-  language   Language
-  trustScore Int        @default(0)
-  lastTrustEventAt DateTime? 
+  id               String               @id @default(uuid())
+  phone            String               @unique
+  role             UserRole
+  status           UserStatus
+  language         Language
+  trustScore       Int                  @default(0)
+  lastTrustEventAt DateTime?
   // relations
-  wallet      Wallet?
-  trustEvents TrustEvent[]
-  ruleAcceptances UserRuleAcceptance[]
+  wallet           Wallet?
+  trustEvents      TrustEvent[]
+  ruleAcceptances  UserRuleAcceptance[]
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt 
-  
+  updatedAt DateTime @updatedAt
+
+  Item Item[]
 }
 
 model Wallet {
@@ -98,11 +99,11 @@ model TrustEvent {
 }
 
 model RuleVersion {
-  id        String   @id @default(uuid())
-  version   Int
-  language  Language
-  content   String
-  isActive  Boolean  @default(false)
+  id       String   @id @default(uuid())
+  version  Int
+  language Language
+  content  String
+  isActive Boolean  @default(false)
 
   createdAt DateTime @default(now())
 
@@ -112,11 +113,11 @@ model RuleVersion {
 }
 
 model UserRuleAcceptance {
-  id            String   @id @default(uuid())
+  id            String @id @default(uuid())
   userId        String
   ruleVersionId String
 
-  acceptedAt    DateTime @default(now())
+  acceptedAt DateTime @default(now())
 
   user        User        @relation(fields: [userId], references: [id])
   ruleVersion RuleVersion @relation(fields: [ruleVersionId], references: [id])
@@ -125,20 +126,23 @@ model UserRuleAcceptance {
 }
 
 model Item {
-  id          String   @id @default(uuid())
-  ownerId     String
+  id      String @id @default(uuid())
+  ownerId String
 
-  category    String
-  gender      String
-  size        String
-  fabric      String
-  wearLevel   String
+  category  String
+  gender    String
+  size      String
+  fabric    String
+  wearLevel String
 
-  state       String
-  zone        String
+  state String
+  zone  String
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  owner       User     @relation(fields: [ownerId], references: [id])
+  cooldownUntil  DateTime?
+  lastReturnedAt DateTime?
+
+  owner User @relation(fields: [ownerId], references: [id])
 }
