@@ -344,3 +344,18 @@ Decisions Locked:
 Notes to Future Self:
 - Never “reset” trust manually to zero.
 
+## DAY 14 — COOLDOWN STATE
+Status: DONE
+
+Completed:
+- Cooldown fields added to item
+- Fabric-based cooldown rules
+- Automatic cooldown release job
+
+Decisions Locked:
+- No instant relisting allowed
+- Hygiene enforced by time
+
+Notes to Future Self:
+- If ops ask for quick relist, refuse.
+

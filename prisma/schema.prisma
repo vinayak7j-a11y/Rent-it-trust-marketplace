@@ -38,6 +38,11 @@ model User {
   wallet           Wallet?
   trustEvents      TrustEvent[]
   ruleAcceptances  UserRuleAcceptance[]
+  heightCm       Int?
+  weightKg       Int?
+  chestCm        Int?
+  waistCm        Int?
+  fitPreference  String?  // slim | regular | loose
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
