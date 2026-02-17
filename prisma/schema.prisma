@@ -38,11 +38,12 @@ model User {
   wallet           Wallet?
   trustEvents      TrustEvent[]
   ruleAcceptances  UserRuleAcceptance[]
-  heightCm       Int?
-  weightKg       Int?
-  chestCm        Int?
-  waistCm        Int?
-  fitPreference  String?  // slim | regular | loose
+  fitAcceptances   FitAcceptance[]
+  heightCm         Int?
+  weightKg         Int?
+  chestCm          Int?
+  waistCm          Int?
+  fitPreference    String? // slim | regular | loose
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -130,6 +131,17 @@ model UserRuleAcceptance {
   @@unique([userId, ruleVersionId])
 }
 
+model FitAcceptance {
+  id         String   @id @default(uuid())
+  userId     String
+  bookingId  String
+  acceptedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, bookingId])
+}
+
 model Item {
   id      String @id @default(uuid())
   ownerId String
@@ -141,14 +153,13 @@ model Item {
   wearLevel String
 
   state String
-  zone  String 
+  zone  String
 
-  garmentChestCm     Int?
-garmentWaistCm     Int?
-garmentLengthCm    Int?
-stretchability     String? // none | low | medium | high
-fitType            String? // slim | regular | loose
-
+  garmentChestCm  Int?
+  garmentWaistCm  Int?
+  garmentLengthCm Int?
+  stretchability  String? // none | low | medium | high
+  fitType         String? // slim | regular | loose
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -388,3 +388,18 @@ Decisions Locked:
 
 Notes to Future Self:
 - Never allow listing without garment fit data.
+
+## DAY 17 — FIT COMPATIBILITY
+Status: DONE
+
+Completed:
+- Compatibility engine implemented
+- Risk categories defined
+- Fit acceptance model added
+
+Decisions Locked:
+- Fit is advisory only
+- User must accept non-disputability
+
+Notes to Future Self:
+- Never add “perfect fit” wording.
