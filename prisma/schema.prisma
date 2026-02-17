@@ -141,7 +141,14 @@ model Item {
   wearLevel String
 
   state String
-  zone  String
+  zone  String 
+
+  garmentChestCm     Int?
+garmentWaistCm     Int?
+garmentLengthCm    Int?
+stretchability     String? // none | low | medium | high
+fitType            String? // slim | regular | loose
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

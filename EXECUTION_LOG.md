@@ -359,3 +359,17 @@ Decisions Locked:
 Notes to Future Self:
 - If ops ask for quick relist, refuse.
 
+## DAY 15 — USER FIT PROFILE
+Status: DONE
+
+Completed:
+- Optional body metrics stored
+- Validation rules enforced
+- Authenticated update endpoint added
+
+Decisions Locked:
+- Fit data is private and optional
+- No perfect-fit claims allowed
+
+Notes to Future Self:
+- Never show user body data to other users.
