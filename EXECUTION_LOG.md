@@ -373,3 +373,18 @@ Decisions Locked:
 
 Notes to Future Self:
 - Never show user body data to other users.
+
+## DAY 16 — ITEM FIT PROFILE
+Status: DONE
+
+Completed:
+- Garment measurement fields added
+- Validation rules enforced
+- Item fit update service and route added
+
+Decisions Locked:
+- Garment measurements are mandatory for listing
+- Structured data over size labels
+
+Notes to Future Self:
+- Never allow listing without garment fit data.
