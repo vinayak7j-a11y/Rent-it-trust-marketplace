@@ -24,6 +24,7 @@ export async function createItemIntent(input: CreateItemInput) {
       wearLevel: input.wearLevel,
       zone: input.zone,
       state: ItemState.INTENT,
+      isVisible: false,
     },
   });
 }

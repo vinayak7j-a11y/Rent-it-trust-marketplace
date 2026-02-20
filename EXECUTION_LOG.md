@@ -403,3 +403,33 @@ Decisions Locked:
 
 Notes to Future Self:
 - Never add “perfect fit” wording.
+
+## DAY 18 — SUPPLY GATING
+Status: DONE
+
+Completed:
+- Onboarding application model created
+- Owner/shop roles gated behind admin approval
+- Application and review routes added
+
+Decisions Locked:
+- No instant role upgrades
+- Supply must be curated
+
+Notes to Future Self:
+- Growth pressure must not bypass supply gating. 
+
+## DAY 19 — INVENTORY INTENT MODE
+Status: DONE
+
+Completed:
+- Visibility flag added to items
+- Intent items hidden by default
+- Admin can view shadow supply
+
+Decisions Locked:
+- Visibility is separate from state
+- Intent items are never public
+
+Notes to Future Self:
+- Never expose intent items in search.
