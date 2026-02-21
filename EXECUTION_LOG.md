@@ -432,4 +432,19 @@ Decisions Locked:
 - Intent items are never public
 
 Notes to Future Self:
-- Never expose intent items in search.
+- Never expose intent items in search. 
+
+## DAY 20 — LISTING ACTIVATION
+Status: DONE
+
+Completed:
+- Listing guard enforcing all requirements
+- Condition + fit + state validation
+- Controlled visibility activation
+
+Decisions Locked:
+- No item can bypass listing guard
+- Visibility is strictly controlled
+
+Notes to Future Self:
+- If ops request manual listing, refuse.

@@ -4,16 +4,23 @@ import { prisma } from '../../infra/db/prisma';
 import { UserRole, UserStatus, Language } from '../../domain';
 
 export async function authRoutes(app: FastifyInstance) {
-  app.post('/auth/login', async (req, reply) => {
-    const { phone } = req.body as { phone: string };
+  app.post('/auth/login', async (req: any, reply) => {
+  const { phone } = req.body;
 
-    const otp = await sendOtp(phone);
+  if (!phone) {
+    return reply.status(400).send({ error: 'Phone required' });
+  }
 
-    (app as any).otpStore = (app as any).otpStore || {};
-    (app as any).otpStore[phone] = otp;
+  const otp = await sendOtp(phone);
 
-    return { success: true };
-  });
+  // store temporarily in memory
+  (app as any).otpStore = {
+    ...(app as any).otpStore,
+    [phone]: otp,
+  };
+
+  return { success: true };
+});
 
   app.post('/auth/verify', async (req, reply) => {
     const { phone, otp } = req.body as { phone: string; otp: string };

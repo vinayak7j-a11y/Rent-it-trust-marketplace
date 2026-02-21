@@ -1,3 +1,4 @@
+import { listingRoutes } from './services/items/listingRoutes';
 import 'dotenv/config';
 import Fastify from 'fastify';
 import jwt from '@fastify/jwt';
@@ -7,6 +8,7 @@ import { authRoutes } from './services/auth/authRoutes';
 import { languageRoutes } from './services/auth/languageRoutes';
 import { ruleRoutes } from './services/rules/ruleRoutes';
 import { itemFitRoutes } from './services/items/itemFitRoutes';
+import { prisma } from './infra/db/prisma'; // make sure this import exists
 
 const app = Fastify();
 
@@ -14,14 +16,23 @@ const app = Fastify();
 app.register(jwt, jwtConfig);
 
 // Auth decorator
-app.decorate('authenticate', async (req: any, reply: any) => {
-  try {
-    await req.jwtVerify();
-  } catch (err) {
-    reply.send(err);
+app.decorate(
+  'authenticate',
+  async function (req: any, reply: any) {
+    try {
+      await req.jwtVerify();
+    } catch (err) {
+      return reply.send(err);
+    }
   }
-}); 
+);
 
+// Cast to avoid TS issues
+declare module 'fastify' {
+  interface FastifyInstance {
+    authenticate: any;
+  }
+}
 // Health route
 app.get('/', async () => {
   return { status: 'Rent It API running' };
@@ -31,10 +42,27 @@ app.get('/', async () => {
 app.register(authRoutes);
 app.register(languageRoutes);
 app.register(ruleRoutes);
+app.register(listingRoutes);
 app.register(itemFitRoutes);
-
+console.log(app.printRoutes());
 export default app;
+app.post('/dev/add-condition/:id', async (req: any, reply) => {
+  try {
+    const snapshot = await prisma.conditionSnapshot.create({
+      data: {
+        itemId: req.params.id,
+        bookingId: 'dev-booking',
+        photoHash: 'hash123',
+        checklist: JSON.stringify(['1','2','3','4','5','6']),
+        capturedBy: 'admin',
+      },
+    });
 
+    return { success: true, snapshot };
+  } catch (err: any) {
+    return reply.status(400).send({ error: err.message });
+  }
+});
 // START SERVER LAST
 const start = async () => {
   try {
