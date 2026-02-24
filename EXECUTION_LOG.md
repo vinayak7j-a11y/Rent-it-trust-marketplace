@@ -447,4 +447,20 @@ Decisions Locked:
 - Visibility is strictly controlled
 
 Notes to Future Self:
-- If ops request manual listing, refuse.
+- If ops request manual listing, refuse. 
+
+## DAY 21 — BASIC SEARCH
+Status: DONE
+
+Completed:
+- Zone-based discovery implemented
+- Owner identity hidden
+- Visible + listed filter enforced
+- Result cap applied
+
+Decisions Locked:
+- Discovery is controlled
+- No hidden supply exposure
+
+Notes to Future Self:
+- Growth pressure must not increase filter complexity early.

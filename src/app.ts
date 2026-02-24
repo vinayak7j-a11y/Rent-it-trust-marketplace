@@ -7,7 +7,8 @@ import { jwtConfig } from './infra/auth/jwt';
 import { authRoutes } from './services/auth/authRoutes';
 import { languageRoutes } from './services/auth/languageRoutes';
 import { ruleRoutes } from './services/rules/ruleRoutes';
-import { itemFitRoutes } from './services/items/itemFitRoutes';
+import { itemFitRoutes } from './services/items/itemFitRoutes'; 
+import { searchRoutes } from './services/discovery/searchRoutes';
 import { prisma } from './infra/db/prisma'; // make sure this import exists
 
 const app = Fastify();
@@ -43,8 +44,8 @@ app.register(authRoutes);
 app.register(languageRoutes);
 app.register(ruleRoutes);
 app.register(listingRoutes);
-app.register(itemFitRoutes);
-console.log(app.printRoutes());
+app.register(itemFitRoutes); 
+app.register(searchRoutes);
 export default app;
 app.post('/dev/add-condition/:id', async (req: any, reply) => {
   try {
@@ -65,8 +66,9 @@ app.post('/dev/add-condition/:id', async (req: any, reply) => {
 });
 // START SERVER LAST
 const start = async () => {
-  try {
-    await app.listen({ port: 3000, host: '0.0.0.0' });
+  try { 
+    await app.listen({ port: 3000, host: '0.0.0.0' }); 
+    console.log(app.printRoutes()); 
     console.log('Server running at http://localhost:3000');
   } catch (err) {
     console.error('START ERROR:', err);
