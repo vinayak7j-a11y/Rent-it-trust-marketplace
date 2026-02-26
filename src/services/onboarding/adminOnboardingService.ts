@@ -1,32 +1,51 @@
+import { prisma } from '../../infra/db/prisma';
 import { UserRole } from '../../domain/enums';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 export async function reviewApplication(
   applicationId: string,
   adminId: string,
   decision: 'approved' | 'rejected'
 ) {
-  const app = await prisma.onboardingApplication.findUnique({
-    where: { id: applicationId },
-  });
+  return prisma.$transaction(async (tx) => {
 
-  if (!app) throw new Error('Application not found');
-
-  if (decision === 'approved') {
-    await prisma.user.update({
-      where: { id: app.userId },
-      data: { role: app.type === 'owner' ? UserRole.OWNER : UserRole.SHOP },
+    // 🔒 Verify admin exists and is admin
+    const admin = await tx.user.findUnique({
+      where: { id: adminId },
     });
-  }
 
-  return prisma.onboardingApplication.update({
-    where: { id: applicationId },
-    data: {
-      status: decision,
-      reviewedBy: adminId,
-      reviewedAt: new Date(),
-    },
+    if (!admin || admin.role !== UserRole.ADMIN) {
+      throw new Error('Not authorized to review applications');
+    }
+
+    const app = await tx.onboardingApplication.findUnique({
+      where: { id: applicationId },
+    });
+
+    if (!app) throw new Error('Application not found');
+
+    if (app.status !== 'pending') {
+      throw new Error('Application already reviewed');
+    }
+
+    if (decision === 'approved') {
+      await tx.user.update({
+        where: { id: app.userId },
+        data: {
+          role:
+            app.type === 'owner'
+              ? UserRole.OWNER
+              : UserRole.SHOP,
+        },
+      });
+    }
+
+    return tx.onboardingApplication.update({
+      where: { id: applicationId },
+      data: {
+        status: decision,
+        reviewedBy: adminId,
+        reviewedAt: new Date(),
+      },
+    });
   });
 }

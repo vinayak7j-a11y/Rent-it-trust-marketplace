@@ -11,7 +11,7 @@ export async function authRoutes(app: FastifyInstance) {
     return reply.status(400).send({ error: 'Phone required' });
   }
 
-  const otp = await sendOtp(phone);
+  const otp = await sendOtp(phone); 
 
   // store temporarily in memory
   (app as any).otpStore = {

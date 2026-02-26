@@ -1,7 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
-
+import { prisma } from '../../infra/db/prisma'; 
 export async function getOrCreateWallet(userId: string) {
   let wallet = await prisma.wallet.findUnique({
     where: { userId },

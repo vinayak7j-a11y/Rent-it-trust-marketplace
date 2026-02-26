@@ -1,14 +1,18 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { prisma } from '../../infra/db/prisma';
 import { transitionItemState } from '../../domain/state-machines/itemStateMachine';
 import { ItemState } from '../../domain/enums';
 
-const prisma = new PrismaClient();
-
 export async function updateItemState(
   itemId: string,
-  nextState: ItemState
+  nextState: ItemState,
+  tx?: Prisma.TransactionClient
 ) {
-  const item = await prisma.item.findUnique({ where: { id: itemId } });
+  const client = tx ?? prisma;
+
+  const item = await client.item.findUnique({
+    where: { id: itemId },
+  });
 
   if (!item) {
     throw new Error('Item not found');
@@ -19,7 +23,7 @@ export async function updateItemState(
     nextState
   );
 
-  return prisma.item.update({
+  return client.item.update({
     where: { id: itemId },
     data: { state: newState },
   });

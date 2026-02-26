@@ -1,32 +1,39 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../infra/db/prisma';
 import { canActivateListing } from '../../rules/listing/listingGuard';
 import { hasConditionSnapshot } from '../condition/conditionQueryService';
 import { updateItemState } from './itemStateService';
 import { ItemState } from '../../domain/enums';
 
-const prisma = new PrismaClient();
+export async function activateListing(
+  itemId: string,
+  userId: string,
+  userRole: string
+) {
+  return prisma.$transaction(async (tx) => {
 
-export async function activateListing(itemId: string) {
-  const item = await prisma.item.findUnique({
-    where: { id: itemId },
-  });
+    const item = await tx.item.findUnique({
+      where: { id: itemId },
+    });
 
-  if (!item) throw new Error('Item not found');
+    if (!item) throw new Error('Item not found');
 
-  const hasCondition = await hasConditionSnapshot(itemId);
+    if (userRole !== 'admin' && item.ownerId !== userId) {
+      throw new Error('Not authorized to activate this item');
+    }
 
-  const allowed = canActivateListing(item, hasCondition);
+    const hasCondition = await hasConditionSnapshot(itemId);
 
-  if (!allowed) {
-    throw new Error('Item not eligible for listing');
-  }
+    const allowed = canActivateListing(item, hasCondition);
 
-  // Move state → LISTED
-  await updateItemState(itemId, ItemState.LISTED);
+    if (!allowed) {
+      throw new Error('Item not eligible for listing');
+    }
 
-  // Make visible
-  return prisma.item.update({
-    where: { id: itemId },
-    data: { isVisible: true },
+    await updateItemState(itemId, ItemState.LISTED, tx);
+
+    return tx.item.update({
+      where: { id: itemId },
+      data: { isVisible: true },
+    });
   });
 }

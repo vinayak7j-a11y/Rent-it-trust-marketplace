@@ -1,10 +1,26 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../infra/db/prisma';
 import { validateItemFit } from '../../rules/fit/itemFitValidation';
 
-const prisma = new PrismaClient();
-
-export async function updateItemFit(itemId: string, data: any) {
+export async function updateItemFit(
+  itemId: string,
+  data: any,
+  userId: string,
+  userRole: string
+) {
   validateItemFit(data);
+
+  const item = await prisma.item.findUnique({
+    where: { id: itemId },
+  });
+
+  if (!item) {
+    throw new Error('Item not found');
+  }
+
+  // If not admin, must own item
+  if (userRole !== 'admin' && item.ownerId !== userId) {
+    throw new Error('Not authorized to modify this item');
+  }
 
   return prisma.item.update({
     where: { id: itemId },
