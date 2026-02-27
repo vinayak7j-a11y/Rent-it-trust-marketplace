@@ -54,14 +54,14 @@ model User {
 }
 
 model Wallet {
-  id       String @id @default(uuid())
-  userId   String @unique 
-  balance  Int    @default(0)
-  currency String @default("INR") 
-  user   User          @relation(fields: [userId], references: [id]) 
-  createdAt DateTime @default(now()) 
-  
-  ledger LedgerEntry[]
+  id        String  @id @default(uuid())
+  userId    String  @unique   // 🔥 THIS IS REQUIRED
+  balance   Int     @default(0)
+  currency  String  @default("INR")
+  createdAt DateTime @default(now())
+
+  user      User    @relation(fields: [userId], references: [id])
+  ledger    LedgerEntry[]
 }
 
 model LedgerEntry {
@@ -169,7 +169,9 @@ model Item {
   cooldownUntil  DateTime?
   lastReturnedAt DateTime?
   isVisible      Boolean   @default(false)
-  owner          User      @relation(fields: [ownerId], references: [id])
+  owner          User      @relation(fields: [ownerId], references: [id]) 
+
+  demandSuggestions DemandSuggestion[]
 }
 
 model ConditionSnapshot {
@@ -219,5 +221,18 @@ model DemandRequest {
 
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id]) 
+
+  suggestions DemandSuggestion[]
+}
+model DemandSuggestion {
+  id        String   @id @default(uuid())
+  demandId  String
+  itemId    String
+  createdAt DateTime @default(now())
+
+  demand    DemandRequest @relation(fields: [demandId], references: [id])
+  item      Item          @relation(fields: [itemId], references: [id])
+
+  @@unique([demandId, itemId])
 }

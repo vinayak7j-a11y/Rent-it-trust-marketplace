@@ -463,4 +463,63 @@ Decisions Locked:
 - No hidden supply exposure
 
 Notes to Future Self:
-- Growth pressure must not increase filter complexity early.
+- Growth pressure must not increase filter complexity early. 
+
+## DAY 22 — DEMAND REQUEST SYSTEM
+Status: DONE
+
+Completed:
+- Paid demand model created
+- Trust-gated creation
+- One active demand rule
+- Expiry job implemented
+
+Decisions Locked:
+- Demand fee non-refundable
+- Casual users filtered out
+
+Notes to Future Self:
+- Do not make demand free during growth.
+
+## HARDENING DAY A — Authorization & Structural Safety
+
+- Removed unsafe dev routes
+- Secured role mutation behind admin approval
+- Enforced state transitions via state machines
+- Ensured listing activation requires condition snapshot
+- Ensured item state transitions throw on invalid flow
+- Confirmed admin-only onboarding review
+
+Status: COMPLETE
+Date: 2026-02-26
+
+
+## HARDENING DAY B — Financial & Concurrency Integrity
+
+- Wrapped demand creation in transaction
+- Atomic wallet debit + demand creation
+- Prevented negative wallet balance (app-level + DB-level)
+- Added DB constraint: wallet_balance_non_negative
+- Added partial unique index: one active demand per user
+- Prevented double demand via DB invariant
+- Implemented demand expiry job (runs every 60s)
+- Verified concurrency safety via terminal stress test
+
+Status: COMPLETE
+Date: 2026-02-26 
+
+## DAY 23 — ASSISTED SEARCH
+Status: DONE
+
+Completed:
+- Demand suggestion model created
+- Admin curated suggestions (max 3)
+- User suggestion viewing endpoint added
+
+Decisions Locked:
+- No messaging between renter and owner
+- Suggestions immutable
+- Platform controls outreach
+
+Notes to Future Self:
+- If users ask for chat, refuse.
