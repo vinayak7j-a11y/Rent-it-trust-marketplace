@@ -1,46 +1,96 @@
-import { PrismaClient } from '@prisma/client';
-import { getOrCreateWallet } from '../wallet/walletService';
-import { appendLedgerEntry } from '../wallet/ledgerService';
+import { Prisma } from '@prisma/client';
 
-const prisma = new PrismaClient();
+type ReleaseEscrowInput = {
+  bookingId: string;
+  renterId: string;
+  ownerId: string;
+  rentalFee: number;
+  deposit: number;
+  damageCharge?: number; // optional
+};
 
-export async function releaseEscrow(bookingId: string) {
-  const escrow = await prisma.escrow.findUnique({
-    where: { bookingId },
+export async function releaseEscrow(
+  input: ReleaseEscrowInput,
+  tx: Prisma.TransactionClient
+) {
+  const totalHeld = input.rentalFee + input.deposit;
+
+  const renterWallet = await tx.wallet.findUnique({
+    where: { userId: input.renterId },
   });
 
-  if (!escrow) {
-    throw new Error('Escrow not found');
+  const ownerWallet = await tx.wallet.findUnique({
+    where: { userId: input.ownerId },
+  });
+
+  if (!renterWallet || !ownerWallet) {
+    throw new Error('Wallet not found');
   }
 
-  if (escrow.status !== 'held') {
-    throw new Error('Escrow is not releasable');
+  if (renterWallet.escrowBalance < totalHeld) {
+    throw new Error('Escrow balance mismatch');
   }
 
-  const ownerWallet = await getOrCreateWallet(escrow.ownerId);
-  const renterWallet = await getOrCreateWallet(escrow.renterId);
+  const damage = input.damageCharge ?? 0;
 
-  // 1️⃣ Pay owner rental fee
-  await appendLedgerEntry({
-    walletId: ownerWallet.id,
-    amount: escrow.rentalFee,
-    type: 'credit',
-    reason: 'Rental payout',
-    referenceId: bookingId,
+  if (damage < 0 || damage > input.deposit) {
+    throw new Error('Invalid damage charge');
+  }
+
+  const ownerReceives = input.rentalFee + damage;
+  const renterRefund = input.deposit - damage;
+
+  // 1️⃣ Deduct total from renter escrow
+  await tx.wallet.update({
+    where: { id: renterWallet.id },
+    data: {
+      escrowBalance: renterWallet.escrowBalance - totalHeld,
+    },
   });
 
-  // 2️⃣ Return deposit to renter
-  await appendLedgerEntry({
-    walletId: renterWallet.id,
-    amount: escrow.deposit,
-    type: 'credit',
-    reason: 'Deposit returned',
-    referenceId: bookingId,
+  // 2️⃣ Credit owner
+  await tx.wallet.update({
+    where: { id: ownerWallet.id },
+    data: {
+      availableBalance: ownerWallet.availableBalance + ownerReceives,
+    },
   });
 
-  // 3️⃣ Update escrow status LAST
-  return prisma.escrow.update({
-    where: { bookingId },
-    data: { status: 'released' },
+  // 3️⃣ Refund renter deposit remainder
+  if (renterRefund > 0) {
+    await tx.wallet.update({
+      where: { id: renterWallet.id },
+      data: {
+        availableBalance: renterWallet.availableBalance + renterRefund,
+      },
+    });
+  }
+
+  // 4️⃣ Ledger logging
+  await tx.ledgerEntry.createMany({
+    data: [
+      {
+        walletId: renterWallet.id,
+        amount: -totalHeld,
+        type: 'escrow_release',
+        reason: 'Escrow released after booking',
+      },
+      {
+        walletId: ownerWallet.id,
+        amount: ownerReceives,
+        type: 'owner_payout',
+        reason: 'Rental payout',
+      },
+      ...(renterRefund > 0
+        ? [
+            {
+              walletId: renterWallet.id,
+              amount: renterRefund,
+              type: 'deposit_refund',
+              reason: 'Deposit refund',
+            },
+          ]
+        : []),
+    ],
   });
 }

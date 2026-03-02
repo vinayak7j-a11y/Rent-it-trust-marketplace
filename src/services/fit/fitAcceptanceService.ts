@@ -1,9 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../infra/db/prisma';
 
-const prisma = new PrismaClient();
-
-export async function acceptFitRisk(userId: string, bookingId: string) {
+export async function acceptFit(userId: string, itemId: string) {
   return prisma.fitAcceptance.create({
-    data: { userId, bookingId },
+    data: {
+      userId,
+      itemId,
+    },
   });
 }

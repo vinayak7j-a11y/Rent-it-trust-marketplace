@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-
+import { ItemState } from '../../domain/enums';
 const prisma = new PrismaClient();
 
 type SearchInput = {
@@ -15,7 +15,7 @@ export async function searchItems(input: SearchInput) {
   const items = await prisma.item.findMany({
     where: {
       zone: input.zone,
-      state: 'listed',
+      state: ItemState.LISTED,
       isVisible: true,
       OR: [
         { cooldownUntil: null },

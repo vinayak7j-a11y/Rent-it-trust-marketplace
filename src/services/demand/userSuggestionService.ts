@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { DemandStatus } from '../../domain/enums';
 
 const prisma = new PrismaClient();
 
@@ -7,7 +8,7 @@ export async function getUserSuggestions(userId: string) {
     where: {
       demand: {
         userId,
-        status: 'active',
+        status: DemandStatus.ACTIVE,
       },
     },
     include: {

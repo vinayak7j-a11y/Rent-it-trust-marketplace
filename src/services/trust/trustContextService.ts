@@ -1,12 +1,17 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { resolveTrustTier } from './trustTierService';
 import { getDepositMultiplier } from '../../rules/trust/depositRules';
 import { getBookingAccessLevel } from '../../rules/trust/eligibilityRules';
 
 const prisma = new PrismaClient();
 
-export async function getTrustContext(userId: string) {
-  const user = await prisma.user.findUnique({
+export async function getTrustContext(
+  userId: string,
+  tx?: Prisma.TransactionClient
+) {
+  const db = tx ?? prisma;
+
+  const user = await db.user.findUnique({
     where: { id: userId },
   });
 
@@ -16,11 +21,12 @@ export async function getTrustContext(userId: string) {
 
   const tier = resolveTrustTier(user.trustScore);
 
-  // Assumes trustScore is up-to-date (see trust decay job)
+  const bookingAccess = getBookingAccessLevel(tier);
+
   return {
     trustScore: user.trustScore,
     tier,
     depositMultiplier: getDepositMultiplier(tier),
-    bookingAccess: getBookingAccessLevel(tier),
+    canRequestBooking: bookingAccess !== 'blocked',
   };
 }

@@ -26,18 +26,28 @@ enum Language {
   hi
 }
 
+enum BookingState {
+  requested
+  approved
+  picked_up
+  returned
+  closed
+  cancelled
+}
+
 model User {
-  id               String               @id @default(uuid())
-  phone            String               @unique
+  id               String           @id @default(uuid())
+  phone            String           @unique
   role             UserRole
   status           UserStatus
   language         Language
-  trustScore       Int                  @default(0)
+  trustScore       Int              @default(0)
+  bookings         Booking[]
   lastTrustEventAt DateTime?
   // relations
   wallet           Wallet?
   trustEvents      TrustEvent[]
-  ruleAcceptances  UserRuleAcceptance[]
+  ruleAcceptances  RuleAcceptance[]
   fitAcceptances   FitAcceptance[]
   heightCm         Int?
   weightKg         Int?
@@ -54,14 +64,15 @@ model User {
 }
 
 model Wallet {
-  id        String  @id @default(uuid())
-  userId    String  @unique   // 🔥 THIS IS REQUIRED
-  balance   Int     @default(0)
-  currency  String  @default("INR")
-  createdAt DateTime @default(now())
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  availableBalance Int      @default(0)
+  escrowBalance    Int      @default(0)
+  currency         String   @default("INR")
+  createdAt        DateTime @default(now())
 
-  user      User    @relation(fields: [userId], references: [id])
-  ledger    LedgerEntry[]
+  user   User          @relation(fields: [userId], references: [id])
+  ledger LedgerEntry[]
 }
 
 model LedgerEntry {
@@ -115,33 +126,52 @@ model RuleVersion {
 
   createdAt DateTime @default(now())
 
-  acceptances UserRuleAcceptance[]
+  acceptances RuleAcceptance[]
 
   @@unique([version, language])
 }
 
-model UserRuleAcceptance {
-  id            String @id @default(uuid())
-  userId        String
-  ruleVersionId String
-
+model RuleAcceptance {
+  id         String   @id @default(uuid())
+  userId     String
+  ruleId     String
   acceptedAt DateTime @default(now())
 
-  user        User        @relation(fields: [userId], references: [id])
-  ruleVersion RuleVersion @relation(fields: [ruleVersionId], references: [id])
+  user          User         @relation(fields: [userId], references: [id])
+  RuleVersion   RuleVersion? @relation(fields: [ruleVersionId], references: [id])
+  ruleVersionId String?
 
-  @@unique([userId, ruleVersionId])
+  @@unique([userId, ruleId])
+}
+
+model Booking {
+  id     String @id @default(uuid())
+  userId String
+  itemId String
+
+  rentalFee Int // in paise
+  deposit   Int // in paise
+
+  state String // requested | approved | picked_up | returned | closed
+
+  startDate DateTime
+  endDate   DateTime
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  item Item @relation(fields: [itemId], references: [id])
 }
 
 model FitAcceptance {
   id         String   @id @default(uuid())
   userId     String
-  bookingId  String
+  itemId     String
   acceptedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  item       Item     @relation(fields: [itemId], references: [id])
 
-  user User @relation(fields: [userId], references: [id])
-
-  @@unique([userId, bookingId])
+  @@unique([userId, itemId])
 }
 
 model Item {
@@ -163,15 +193,17 @@ model Item {
   stretchability     String? // none | low | medium | high
   fitType            String? // slim | regular | loose
   conditionSnapshots ConditionSnapshot[]
+  fitAcceptances     FitAcceptance[]
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
 
   cooldownUntil  DateTime?
   lastReturnedAt DateTime?
   isVisible      Boolean   @default(false)
-  owner          User      @relation(fields: [ownerId], references: [id]) 
+  owner          User      @relation(fields: [ownerId], references: [id])
 
   demandSuggestions DemandSuggestion[]
+  bookings          Booking[]
 }
 
 model ConditionSnapshot {
@@ -221,18 +253,19 @@ model DemandRequest {
 
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id]) 
+  user User @relation(fields: [userId], references: [id])
 
   suggestions DemandSuggestion[]
 }
+
 model DemandSuggestion {
   id        String   @id @default(uuid())
   demandId  String
   itemId    String
   createdAt DateTime @default(now())
 
-  demand    DemandRequest @relation(fields: [demandId], references: [id])
-  item      Item          @relation(fields: [itemId], references: [id])
+  demand DemandRequest @relation(fields: [demandId], references: [id])
+  item   Item          @relation(fields: [itemId], references: [id])
 
   @@unique([demandId, itemId])
 }

@@ -9,7 +9,7 @@ export async function runCooldownRelease() {
 
   const items = await prisma.item.findMany({
     where: {
-      state: 'cooldown',
+      state: ItemState.COOLDOWN,
       cooldownUntil: { lte: now },
     },
   });

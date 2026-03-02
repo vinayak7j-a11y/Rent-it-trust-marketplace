@@ -1,17 +1,17 @@
 import { prisma } from '../infra/db/prisma';
-
+import { DemandStatus } from '../domain/enums';
 export async function expireDemands() {
   const now = new Date();
 
   const expired = await prisma.demandRequest.updateMany({
     where: {
-      status: 'active',
+      status: DemandStatus.ACTIVE,
       expiresAt: {
         lt: now,
       },
     },
     data: {
-      status: 'expired',
+      status: DemandStatus.EXPIRED,
     },
   });
 

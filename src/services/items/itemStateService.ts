@@ -22,6 +22,9 @@ export async function updateItemState(
     item.state as ItemState,
     nextState
   );
+  if (!Object.values(ItemState).includes(newState)) {
+    throw new Error('Invalid item state transition');
+  }
 
   return client.item.update({
     where: { id: itemId },

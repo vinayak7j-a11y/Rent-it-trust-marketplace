@@ -1,8 +1,4 @@
-import { ItemState } from '../';
-
-import { emitEvent } from '../../events/eventEmitter';
-import { EventType } from '../../events/eventTypes';
-
+import { ItemState } from '../enums';
 
 export class InvalidItemStateTransitionError extends Error {
   constructor(from: ItemState, to: ItemState) {
@@ -37,15 +33,6 @@ export function transitionItemState(
   if (!allowedNextStates || !allowedNextStates.includes(next)) {
     throw new InvalidItemStateTransitionError(current, next);
   }
-emitEvent({
-  type: EventType.ITEM_STATE_CHANGED,
-  entityType: 'item',
-  entityId: 'UNKNOWN', // will be real ID later
-  payload: {
-    from: current,
-    to: next,
-  },
-});
 
   return next;
 }

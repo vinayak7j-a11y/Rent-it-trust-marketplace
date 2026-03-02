@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 export async function getIntentItems() {
   return prisma.item.findMany({
     where: {
-      state: 'intent',
+      state: ItemState.INTENT,
     },
   });
 }
