@@ -563,3 +563,20 @@ Decisions Locked:
 
 Notes to Future Self:
 - Never auto-approve bookings.
+## DAY 25 — PICKUP FLOW
+Status: DONE
+
+Completed:
+- Pickup tracking fields added
+- Re-verification snapshot required
+- 45-minute issue window enforced
+- Booking moved to picked_up
+- Item moved to in_use
+
+Decisions Locked:
+- No pickup without approval
+- Snapshot mandatory at pickup
+- Panic window limited
+
+Notes to Future Self:
+- Do not extend issue window casually.
