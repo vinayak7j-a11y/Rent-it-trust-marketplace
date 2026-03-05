@@ -522,4 +522,44 @@ Decisions Locked:
 - Platform controls outreach
 
 Notes to Future Self:
-- If users ask for chat, refuse.
+- If users ask for chat, refuse. 
+
+## ENUM MIGRATION & TRANSACTION HARDENING
+Status: DONE
+
+Completed:
+- Removed all raw state strings (Item, Booking, Demand)
+- Introduced DemandStatus enum
+- Ensured domain separation between UserStatus, DemandStatus, BookingState, ItemState
+- Made getTrustContext transaction-aware
+- Updated booking and demand flows to pass transaction client
+- Hardened cancellation flow
+- Verified escrow locking inside transactions
+- Ran cancellation integration audit successfully
+
+Decisions Locked:
+- No raw lifecycle strings allowed anywhere in codebase
+- All state comparisons must use enums
+- All critical flows (booking, demand, cancellation) must be transaction-safe
+- Domain enums cannot be mixed across models
+
+Notes to Future Self:
+- Any new lifecycle field must get its own enum.
+- Never bypass transaction boundaries for trust, wallet, or booking logic. 
+
+## DAY 24 — BOOKING CREATION
+Status: DONE
+
+Completed:
+- Booking model created
+- Escrow locked during booking creation
+- Trust-based deposit applied
+- Item moved to booked state
+
+Decisions Locked:
+- No instant bookings
+- Escrow mandatory
+- One active booking per item
+
+Notes to Future Self:
+- Never auto-approve bookings.
