@@ -579,4 +579,21 @@ Decisions Locked:
 - Panic window limited
 
 Notes to Future Self:
-- Do not extend issue window casually.
+- Do not extend issue window casually. 
+## DAY 26 — RETURN FLOW
+Status: DONE
+
+Completed:
+- Return snapshot system
+- Damage classification rules
+- Automatic penalty calculation
+- Booking moved to returned
+- Item moved to returned
+
+Decisions Locked:
+- No negotiation on damage
+- Penalty rules fixed
+
+Notes to Future Self:
+- Emotional disputes are prevented by rules.
+

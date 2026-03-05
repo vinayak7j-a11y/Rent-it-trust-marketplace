@@ -156,7 +156,9 @@ model Booking {
 
   startDate DateTime
   endDate   DateTime
-
+  returnVerifiedAt DateTime?
+  damageType       String?
+  damagePenalty    Int?
   createdAt DateTime @default(now())
   pickupVerifiedAt DateTime?
   issueWindowUntil DateTime?

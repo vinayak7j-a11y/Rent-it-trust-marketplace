@@ -1,27 +1,28 @@
 import { PrismaClient } from '@prisma/client';
 import { updateItemState } from '../items/itemStateService';
-import { issueWindowDurationMinutes } from '../../rules/pickup/pickupRules';
+import { calculateDamagePenalty } from '../../rules/damage/damageRules';
 import { ItemState } from '../../domain/enums';
 import { createConditionSnapshot } from '../condition/conditionService';
+
 const prisma = new PrismaClient();
 
-export async function pickupBooking(
+export async function returnBooking(
   bookingId: string,
   photoUrls: string[],
+  damageType: string,
   capturedBy: 'shop' | 'agent' | 'admin'
 ) {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    include: { item: true },
   });
 
   if (!booking) throw new Error('Booking not found');
 
-  if (booking.state !== 'approved') {
-    throw new Error('Booking not approved for pickup');
+  if (booking.state !== 'picked_up') {
+    throw new Error('Booking not in active use');
   }
 
-  // Re-verify condition
+  // Capture return condition
   await createConditionSnapshot({
     itemId: booking.itemId,
     bookingId,
@@ -29,21 +30,22 @@ export async function pickupBooking(
     capturedBy,
   });
 
-  const now = new Date();
-  const issueWindow = new Date(
-    now.getTime() + issueWindowDurationMinutes() * 60 * 1000
-  );
+  const penalty = calculateDamagePenalty(damageType as any);
 
   await prisma.booking.update({
     where: { id: bookingId },
     data: {
-      state: 'picked_up',
-      pickupVerifiedAt: now,
-      issueWindowUntil: issueWindow,
+      state: 'returned',
+      returnVerifiedAt: new Date(),
+      damageType,
+      damagePenalty: penalty,
     },
   });
 
-  await updateItemState(booking.itemId, ItemState.IN_USE);
+  await updateItemState(booking.itemId, ItemState.RETURNED);
 
-  return { success: true };
+  return {
+    success: true,
+    penalty,
+  };
 }
