@@ -153,12 +153,14 @@ model Booking {
   deposit   Int // in paise
 
   state String // requested | approved | picked_up | returned | closed
-
-  startDate DateTime
-  endDate   DateTime
   returnVerifiedAt DateTime?
   damageType       String?
   damagePenalty    Int?
+  startDate DateTime
+  endDate   DateTime
+  ownerPayoutAt DateTime?
+  depositReleasedAt DateTime?
+  closedAt DateTime?
   createdAt DateTime @default(now())
   pickupVerifiedAt DateTime?
   issueWindowUntil DateTime?

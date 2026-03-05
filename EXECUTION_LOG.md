@@ -595,5 +595,18 @@ Decisions Locked:
 - Penalty rules fixed
 
 Notes to Future Self:
-- Emotional disputes are prevented by rules.
+- Emotional disputes are prevented by rules. 
+
+## DAY 27 — PAYOUT & TRUST
+Status: DONE
+
+Completed:
+- Owner payout after return
+- Deposit release logic
+- Trust update system
+- Booking lifecycle closure
+
+Decisions Locked:
+- Funds always held by platform
+- Damage deducted automatically
 
