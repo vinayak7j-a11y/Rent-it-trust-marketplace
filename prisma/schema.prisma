@@ -274,3 +274,12 @@ model DemandSuggestion {
 
   @@unique([demandId, itemId])
 }
+
+model AdminActionLog {
+  id        String   @id @default(uuid())
+  adminId   String
+  action    String
+  targetId  String
+  metadata  String?
+  createdAt DateTime @default(now())
+}
