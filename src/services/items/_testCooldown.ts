@@ -10,4 +10,4 @@ async function test() {
   await runCooldownRelease();
 }
 
-test();
+test(); 

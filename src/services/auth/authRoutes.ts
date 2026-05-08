@@ -2,59 +2,86 @@ import { FastifyInstance } from 'fastify';
 import { sendOtp, verifyOtp } from '../../infra/auth/otpService';
 import { prisma } from '../../infra/db/prisma';
 import { UserRole, UserStatus, Language } from '../../domain';
-import { getOrCreateWallet } from '../wallet/walletService'; 
+import { getOrCreateWallet } from '../wallet/walletService';
+
+type LoginBody = {
+  phone: string;
+};
+
+type VerifyBody = {
+  phone: string;
+  otp: string;
+};
+
 export async function authRoutes(app: FastifyInstance) {
-  app.post('/auth/login', async (req: any, reply) => {
-  const { phone } = req.body;
 
-  if (!phone) {
-    return reply.status(400).send({ error: 'Phone required' });
-  }
+  // 🔹 SEND OTP
+  app.post('/auth/login', async (req, reply) => {
+    const { phone } = req.body as LoginBody;
 
-  const otp = await sendOtp(phone); 
+    if (!phone) {
+      return reply.status(400).send({ error: 'Phone required' });
+    }
 
-  // store temporarily in memory
-  (app as any).otpStore = {
-    ...(app as any).otpStore,
-    [phone]: otp,
-  };
+    const otp = await sendOtp(phone);
 
-  return { success: true };
-});
+    // ⚠️ TEMP: in-memory (replace with Redis later)
+    (app as any).otpStore = {
+      ...(app as any).otpStore,
+      [phone]: otp,
+    };
 
+    return { success: true };
+  });
+
+  // 🔹 VERIFY OTP + LOGIN
   app.post('/auth/verify', async (req, reply) => {
-  const { phone, otp } = req.body as { phone: string; otp: string };
+    const { phone, otp } = req.body as VerifyBody;
 
-  const actualOtp = (app as any).otpStore?.[phone];
+    if (!phone || !otp) {
+      return reply.status(400).send({ error: 'Phone and OTP required' });
+    }
 
-  if (!verifyOtp(otp, actualOtp)) {
-    return reply.status(401).send({ error: 'Invalid OTP' });
-  }
+    const actualOtp = (app as any).otpStore?.[phone];
 
-  let user = await prisma.user.findUnique({
-    where: { phone },
-  });
+    if (!actualOtp || !verifyOtp(otp, actualOtp)) {
+      return reply.status(401).send({ error: 'Invalid OTP' });
+    }
 
-  if (!user) {
-    user = await prisma.user.create({
-      data: {
-        phone,
-        role: UserRole.RENTER,
-        status: UserStatus.ACTIVE,
-        language: Language.EN,
-      },
+    // 🔒 Prevent OTP reuse
+    delete (app as any).otpStore[phone];
+
+    let user = await prisma.user.findUnique({
+      where: { phone },
     });
-  }
 
-  // 🔥 ADD THIS LINE HERE (after user exists)
-  await getOrCreateWallet(user.id);
+    // 🔹 CREATE USER IF NOT EXISTS
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          phone,
+          role: UserRole.RENTER,
+          status: UserStatus.ACTIVE,
+          language: Language.EN,
+        },
+      });
+    }
 
-  const token = app.jwt.sign({
-    userId: user.id,
-    role: user.role,
-    status: user.status,
+    // 🔹 ENSURE WALLET EXISTS
+    await getOrCreateWallet(user.id);
+
+    // 🔹 GENERATE JWT (INCLUDES ROLE — CRITICAL)
+    const token = app.jwt.sign(
+      {
+        userId: user.id,
+        role: user.role,
+        status: user.status,
+      },
+      {
+        expiresIn: '7d',
+      }
+    );
+
+    return { token };
   });
-
-  return { token };
-});
-}; 
+}

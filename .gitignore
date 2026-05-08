@@ -19,4 +19,11 @@ pnpm-debug.log*
 # Build
 dist/
 
-/src/generated/prisma
+/src/generated/prisma 
+
+node_modules
+.env
+dist
+coverage
+.prisma
+generated

@@ -7,15 +7,28 @@ import { jwtConfig } from './infra/auth/jwt';
 import { authRoutes } from './services/auth/authRoutes';
 import { languageRoutes } from './services/auth/languageRoutes';
 import { ruleRoutes } from './services/rules/ruleRoutes';
-import { itemFitRoutes } from './services/items/itemFitRoutes'; 
+import { itemFitRoutes } from './services/items/itemFitRoutes';
 import { onboardingRoutes } from './services/onboarding/onboardingRoutes';
 import { adminOnboardingRoutes } from './services/onboarding/adminOnboardingRoutes';
-import { searchRoutes } from './services/discovery/searchRoutes'; 
-import { demandRoutes } from './services/demand/demandRoutes'; 
-import { requireRole } from './middleware/roleGuard';
-import { prisma } from './infra/db/prisma'; // make sure this import exists 
+import { searchRoutes } from './services/discovery/searchRoutes';
+import { demandRoutes } from './services/demand/demandRoutes';
+import { requireRoles } from './middleware/roleGuard';
+import { prisma } from './infra/db/prisma';
+import { FastifyRequest, FastifyReply } from 'fastify';
 
 const app = Fastify();
+
+// ✅ PARAM TYPE
+type AddConditionParams = {
+  id: string;
+};
+
+// ✅ JWT USER TYPE (IMPORTANT)
+type JwtUser = {
+  id: string;
+  role: string;
+  status: string;
+};
 
 // JWT
 app.register(jwt, jwtConfig);
@@ -26,7 +39,9 @@ app.decorate(
     try {
       await req.jwtVerify();
 
-      if (req.user.status === 'banned') {
+      const user = req.user as JwtUser;
+
+      if (user.status === 'banned') {
         return reply.status(403).send({ error: 'Account banned' });
       }
 
@@ -36,46 +51,70 @@ app.decorate(
   }
 );
 
-// Cast to avoid TS issues
+// ✅ ONLY keep this (DO NOT override user)
 declare module 'fastify' {
   interface FastifyInstance {
     authenticate: any;
   }
 }
+
 // Health route
 app.get('/', async () => {
   return { status: 'Rent It API running' };
 });
 
-// Route registrations
+// Routes
 app.register(authRoutes);
 app.register(languageRoutes);
 app.register(ruleRoutes);
 app.register(listingRoutes);
-app.register(itemFitRoutes); 
+app.register(itemFitRoutes);
 app.register(onboardingRoutes);
-app.register(adminOnboardingRoutes);  
-app.register(searchRoutes); 
+app.register(adminOnboardingRoutes);
+app.register(searchRoutes);
 app.register(demandRoutes);
-export default app;
+
+// ✅ FIXED ROUTE 
+// =========================================
+// DEV ONLY ROUTE
+// Simulates item verification before
+// verifier/shop workflow is implemented.
+// NOT intended for production usage.
+// =========================================
 app.post(
   '/dev/add-condition/:id',
-  { preHandler: [app.authenticate, requireRole('admin')] },
-  async (req: any, reply) => {
+  {
+    preHandler: [app.authenticate, requireRoles(['admin', 'shop', 'agent'])],
+  },
+  async (
+    req: FastifyRequest<{ Params: AddConditionParams }>,
+    reply: FastifyReply
+  ) => {
 
-    // 🔒 Disable in production
+    const user = req.user as JwtUser;
+
     if (process.env.NODE_ENV === 'production') {
       return reply.status(403).send({ error: 'Disabled in production' });
+    }
+
+    // 🚨 Prevent double verification
+    const existing = await prisma.conditionSnapshot.findFirst({
+      where: { itemId: req.params.id },
+    });
+
+    if (existing) {
+      return reply.status(400).send({ error: 'Already verified' });
     }
 
     try {
       const snapshot = await prisma.conditionSnapshot.create({
         data: {
           itemId: req.params.id,
-          bookingId: 'dev-booking',
+          bookingId: 'dev-booking', 
+          type: "initial", 
           photoHash: 'hash123',
           checklist: JSON.stringify(['1','2','3','4','5','6']),
-          capturedBy: 'admin',
+          capturedBy: user.role,
         },
       });
 
@@ -85,18 +124,23 @@ app.post(
     }
   }
 );
-// START SERVER LAST
+
+export default app;
+
+// START SERVER
 const start = async () => {
-  try { 
-    await app.listen({ port: 3000, host: '0.0.0.0' }); 
-    console.log(app.printRoutes()); 
+  try {
+    await app.listen({ port: 3000, host: '0.0.0.0' });
+    console.log(app.printRoutes());
     console.log('Server running at http://localhost:3000');
   } catch (err) {
     console.error('START ERROR:', err);
     process.exit(1);
   }
-}; 
+};
+
 setInterval(async () => {
   await expireDemands();
-}, 60 * 1000); // every 1 minute
+}, 60 * 1000);
+
 start();

@@ -36,31 +36,34 @@ enum BookingState {
 }
 
 model User {
-  id               String           @id @default(uuid())
-  phone            String           @unique
-  role             UserRole
-  status           UserStatus
-  language         Language
-  trustScore       Int              @default(0)
+  id         String     @id @default(uuid())
+  phone      String     @unique
+  role       UserRole   @default(renter)
+  status     UserStatus
+  language   Language
+  trustScore Int        @default(0)
+
   bookings         Booking[]
   lastTrustEventAt DateTime?
-  // relations
-  wallet           Wallet?
-  trustEvents      TrustEvent[]
-  ruleAcceptances  RuleAcceptance[]
-  fitAcceptances   FitAcceptance[]
-  heightCm         Int?
-  weightKg         Int?
-  chestCm          Int?
-  waistCm          Int?
-  fitPreference    String? // slim | regular | loose 
+
+  wallet          Wallet?
+  trustEvents     TrustEvent[]
+  ruleAcceptances RuleAcceptance[]
+  fitAcceptances  FitAcceptance[]
+
+  heightCm      Int?
+  weightKg      Int?
+  chestCm       Int?
+  waistCm       Int?
+  fitPreference String?
 
   onboardingApplications OnboardingApplication[]
   demandRequests         DemandRequest[]
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
 
-  Item Item[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items Item[]
 }
 
 model Wallet {
@@ -149,21 +152,27 @@ model Booking {
   userId String
   itemId String
 
-  rentalFee Int // in paise
-  deposit   Int // in paise
+  rentalFee Int
+  deposit   Int
 
-  state String // requested | approved | picked_up | returned | closed
+  state String
+
   returnVerifiedAt DateTime?
   damageType       String?
   damagePenalty    Int?
+
   startDate DateTime
   endDate   DateTime
-  ownerPayoutAt DateTime?
+
+  ownerPayoutAt     DateTime?
   depositReleasedAt DateTime?
-  closedAt DateTime?
-  createdAt DateTime @default(now())
+  closedAt          DateTime?
+
   pickupVerifiedAt DateTime?
   issueWindowUntil DateTime?
+
+  createdAt DateTime @default(now())
+
   user User @relation(fields: [userId], references: [id])
   item Item @relation(fields: [itemId], references: [id])
 }
@@ -173,8 +182,9 @@ model FitAcceptance {
   userId     String
   itemId     String
   acceptedAt DateTime @default(now())
-  user       User     @relation(fields: [userId], references: [id])
-  item       Item     @relation(fields: [itemId], references: [id])
+
+  user User @relation(fields: [userId], references: [id])
+  item Item @relation(fields: [itemId], references: [id])
 
   @@unique([userId, itemId])
 }
@@ -192,48 +202,57 @@ model Item {
   state String
   zone  String
 
-  garmentChestCm     Int?
-  garmentWaistCm     Int?
-  garmentLengthCm    Int?
-  stretchability     String? // none | low | medium | high
-  fitType            String? // slim | regular | loose
-  conditionSnapshots ConditionSnapshot[]
-  fitAcceptances     FitAcceptance[]
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  garmentChestCm  Int?
+  garmentWaistCm  Int?
+  garmentLengthCm Int?
+
+  stretchability String?
+  fitType        String?
 
   cooldownUntil  DateTime?
   lastReturnedAt DateTime?
   isVisible      Boolean   @default(false)
-  owner          User      @relation(fields: [ownerId], references: [id])
 
-  demandSuggestions DemandSuggestion[]
-  bookings          Booking[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id])
+
+  conditionSnapshots ConditionSnapshot[]
+  fitAcceptances     FitAcceptance[]
+  demandSuggestions  DemandSuggestion[]
+  bookings           Booking[]
 }
 
 model ConditionSnapshot {
-  id        String @id @default(uuid())
+  id        String  @id @default(uuid())
   itemId    String
-  bookingId String
+  bookingId String?
 
-  photoHash  String
-  checklist  String // JSON string
-  capturedBy String // shop | agent | admin
+  type String
+
+  photoHash String
+  checklist String
+
+  capturedBy   String
+  capturedById String?
 
   createdAt DateTime @default(now())
 
   item Item @relation(fields: [itemId], references: [id])
 
-  @@unique([itemId, bookingId])
+  @@unique([itemId, type])
+  @@index([itemId])
+  @@index([bookingId])
 }
 
 model OnboardingApplication {
   id           String    @id @default(uuid())
   userId       String
-  type         String // owner | shop
+  type         String
   businessName String?
   description  String
-  status       String // pending | approved | rejected
+  status       String
   reviewedBy   String?
   reviewedAt   DateTime?
 
@@ -251,10 +270,10 @@ model DemandRequest {
   size      String
   eventDate DateTime
 
-  status    String // active | fulfilled | expired
+  status    String
   expiresAt DateTime
 
-  feePaid Int // paise
+  feePaid Int
 
   createdAt DateTime @default(now())
 
@@ -264,9 +283,10 @@ model DemandRequest {
 }
 
 model DemandSuggestion {
-  id        String   @id @default(uuid())
-  demandId  String
-  itemId    String
+  id       String @id @default(uuid())
+  demandId String
+  itemId   String
+
   createdAt DateTime @default(now())
 
   demand DemandRequest @relation(fields: [demandId], references: [id])
@@ -276,10 +296,11 @@ model DemandSuggestion {
 }
 
 model AdminActionLog {
-  id        String   @id @default(uuid())
-  adminId   String
-  action    String
-  targetId  String
-  metadata  String?
+  id       String  @id @default(uuid())
+  adminId  String
+  action   String
+  targetId String
+  metadata String?
+
   createdAt DateTime @default(now())
 }
